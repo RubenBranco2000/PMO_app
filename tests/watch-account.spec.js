@@ -1,40 +1,42 @@
+
 const { test, expect } = require('@playwright/test');
 
 test('watch IPDJ account and validate watched section', async ({ page }) => {
 
-  // abrir app já autenticada
   await page.goto('/');
 
-  // esperar dashboard
   await page.waitForLoadState('networkidle');
 
-  // navegar para Accounts
   await page.getByRole('link', { name: 'Accounts' }).click();
-    await page.waitForURL('**/accounts');
+  await page.waitForURL('**/accounts');
 
-  // esperar tabela/accounts
   await page.waitForLoadState('networkidle');
 
-  // procurar card da IPDJ
-    const ipdjCard = page.locator('div').filter({
+  // ✅ localizar card IPDJ corretamente (sem ambiguidade)
+  const ipdjCard = page.locator('.account-card').filter({
     has: page.getByText('IPDJ')
-    }).first();
-
-    await expect(ipdjCard).toBeVisible({
-    timeout: 15000
-    });
-
-// clicar WATCH dentro do card
-    await page.getByRole('button', { name: 'WATCH' }).nth(0).click();
-
-  // voltar ao dashboard
-  await page.getByText('Dashboard').click();
-
-  await page.waitForLoadState('networkidle');
-
-  // validar watched accounts
-  await expect(page.getByText('IPDJ')).toBeVisible({
-    timeout: 15000
   });
+
+  await expect(ipdjCard).toBeVisible({ timeout: 15000 });
+
+  // ✅ garantir que tem botão WATCH dentro
+  const watchButton = ipdjCard.getByRole('button', { name: 'WATCH' });
+
+  await expect(watchButton).toBeVisible();
+
+  // ✅ localizar contador correto
+  const watchedCard = page.locator('button.stat-card.watched');
+  const watchedValue = watchedCard.locator('h3');
+
+  const before = parseInt(await watchedValue.innerText());
+
+  // ✅ click REAL no botão certo
+  await watchButton.click();
+
+  // ✅ esperar atualização do contador
+  await expect(async () => {
+    const value = parseInt(await watchedValue.innerText());
+    expect(value).toBe(before + 1);
+  }).toPass({ timeout: 7000 });
 
 });
