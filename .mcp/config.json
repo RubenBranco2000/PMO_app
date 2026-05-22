@@ -1,12 +1,8 @@
 {
-  "servers": {
-    "playwright": {
-      "command": "npx",
-      "args": [
-        "@playwright/mcp@latest",
-        "--storage-state",
-        "./playwright/.auth/user.json"
-      ]
-    }
+  "playwright": {
+    "browser": "chromium",
+    "headless": false,
+    "storageState": "playwright/.auth/user.json",
+    "baseURL": "https://devfrontendstorage.z6.web.core.windows.net/"
   }
 }
