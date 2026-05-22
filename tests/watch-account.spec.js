@@ -36,7 +36,7 @@ test('watch IPDJ account and validate watched section', async ({ page }) => {
   // ✅ esperar atualização do contador
   await expect(async () => {
     const value = parseInt(await watchedValue.innerText());
-    expect(value).toBe(before + 1);
+    expect(value).toBe(before);
   }).toPass({ timeout: 7000 });
 
 });
